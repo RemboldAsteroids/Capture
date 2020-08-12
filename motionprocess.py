@@ -255,8 +255,15 @@ def analyze(buffsize, savepath, headless, vpath=None, delay=1):
 
             # If no frame to grab, either we have an issue or we are at the end
             if not grabbed:
-                d6log.warning("No frame was grabbed. Exiting run loop.")
-                break
+                counter = 1
+                while not grabbed and counter < 6:
+                    d6log.warning('No frame grabbed. Waiting 60 seconds then retrying. (Attempt {counter})'.format(counter=counter))
+                    time.sleep(60)
+                    (grabbed, frame) = cam.read()
+                    counter += 1
+                if counter > 6:
+                    d6log.warning("No frame was grabbed and video seeming lost. Exiting run loop.")
+                    break
 
             # Initialize frame as no containing an event, so that consecutive
             # non-event frame counter should augment
