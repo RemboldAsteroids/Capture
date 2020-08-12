@@ -193,6 +193,11 @@ def analyze(buffsize, savepath, headless, vpath=None, delay=1):
 
     disk_full = False
 
+    # Get masked image
+    mask = cv2.imread('Images/Current_Loc_Mask.png')
+    mask = cv2.cvtColor(mask, cv2.COLOR_RGB2GRAY)
+    _, mask = cv2.threshold(mask, 100, 255, cv2.THRESH_BINARY)
+
     # Grab one frame to initialize
     (grabbed, frame) = cam.read()
 
@@ -272,6 +277,9 @@ def analyze(buffsize, savepath, headless, vpath=None, delay=1):
             # Process Frame
             gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
             B = gray.copy()
+
+            # Mask image
+            gray = cv2.bitwise_and(gray, mask)
 
             # Resize grayscale image for faster image processing
             # (reducing each dimension by a factor of 2)
