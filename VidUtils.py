@@ -30,7 +30,7 @@ class KeyClipWriter:
         if self.recording:
             self.Q.put(frame)
 
-    def start(self, outputPath, fourcc, fps):
+    def start(self, outputPath, fourcc, fps, isColor=True):
         # Set recording flag
         self.recording = True
         self.outputPath = outputPath
@@ -40,7 +40,7 @@ class KeyClipWriter:
             fourcc,
             fps,
             (self.frames[0].shape[1], self.frames[0].shape[0]),
-            True,
+            isColor,
         )
         # Initialize queue of frames to be written
         self.Q = Queue()

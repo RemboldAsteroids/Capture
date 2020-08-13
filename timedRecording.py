@@ -81,7 +81,7 @@ def main():
 
         if not kcw.recording:
             path = "{}/{}.avi".format(args['output'], datetime.now().strftime('%Y%m%d_%H%M%S'))
-            fourcc = cv2.VideoWriter_fourcc(*'XVID')
+            fourcc = cv2.VideoWriter_fourcc(*'Y800')
             kcw.start(path, fourcc, 30)
 
         printTimeRemaining(endtime)

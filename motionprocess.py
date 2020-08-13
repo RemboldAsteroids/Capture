@@ -354,8 +354,9 @@ def analyze(buffsize, savepath, headless, vpath=None, delay=1):
                         )
                         # kcw.start(p, cv2.VideoWriter_fourcc(*'H264'), 30)
                         # kcw.start(p, cv2.VideoWriter_fourcc(*'FFV1'), 30)
-                        kcw.start(p, cv2.VideoWriter_fourcc(*"XVID"), 30)
+                        # kcw.start(p, cv2.VideoWriter_fourcc(*"XVID"), 30)
                         # kcw.start(p, cv2.VideoWriter_fourcc(*'HFYU'), 30)
+                        kcw.start(p, cv2.VideoWriter_fourcc(*'Y800'), 30, isColor=False)
                         d6log.info("New event detected. Video name: {}".format(p))
                         write_to_table(get_Hough_Avg_Pt(lines[0]))
                     else:
@@ -368,7 +369,8 @@ def analyze(buffsize, savepath, headless, vpath=None, delay=1):
 
             # Create output image with grayscale image saved as blue color
             # output = cv2.merge([B, G, R])
-            output = cv2.cvtColor(B, cv2.COLOR_GRAY2RGB)
+            #output = cv2.cvtColor(B, cv2.COLOR_GRAY2RGB)
+            output = B
 
             # Wrapping things up
             if updateConsecFrames:
