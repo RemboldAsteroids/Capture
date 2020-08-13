@@ -70,19 +70,20 @@ def main():
 
     while datetime.now() <= endtime:
         frame = cam.read()[1]
+        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
         cv2.putText(frame,
                 datetime.now().strftime('%Y%m%d_%H%M%S.%f'),
                 (10, frame.shape[0]-10),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 0.35,
-                (125,125,125),
+                125,
                 )
         kcw.update(frame)
 
         if not kcw.recording:
             path = "{}/{}.avi".format(args['output'], datetime.now().strftime('%Y%m%d_%H%M%S'))
             fourcc = cv2.VideoWriter_fourcc(*'Y800')
-            kcw.start(path, fourcc, 30)
+            kcw.start(path, fourcc, 30, isColor=False)
 
         printTimeRemaining(endtime)
 
