@@ -21,6 +21,7 @@ class KeyClipWriter:
         self.thread = None
         self.recording = False
         self.outputPath = None
+        self.isColor = True
 
     def update(self, frame):
         # Add frame to the frame buffer
@@ -110,6 +111,9 @@ class ShortClipWriter:
         self.recording = False
         self.outputPath = None
         self.toolong = False
+        self.fourcc = None
+        self.fps = 30
+        self.is_color = True
 
     def update(self, frame):
         """Update both the rolling buffer and, if recording,
@@ -127,7 +131,7 @@ class ShortClipWriter:
             else:
                 self.Q.append(frame)
 
-    def start(self, outputPath, fourcc, fps):
+    def start(self, output_path, fourcc, fps, is_color=True):
         """Starts a video recording event, setting the output path and
         other video parameters. Adds the last buffer of images to the
         video buffer to be written to disk upon the events conclusion.
@@ -139,9 +143,10 @@ class ShortClipWriter:
         # Set initial recording flags
         self.recording = True
         self.toolong = False
-        self.outputPath = outputPath
+        self.outputPath = output_path
         self.fourcc = fourcc
         self.fps = fps
+        self.is_color = is_color
 
         # Initialize queue of frames to be written
         self.Q = deque()
@@ -149,25 +154,26 @@ class ShortClipWriter:
         # Add everything currently in the frames buffer to the queue
         self.Q.extend(self.frames)
 
-    def write(self, framelist, outputPath, fourcc, fps):
+    def write(self):
         """Takes every frame in the provided framelist deque and writes
         to video, releasing the writer upon conclusion.
 
         framelist: (deque) Queue of np.array frames to be written to video
         """
+        # Lock in current framelist
+        framelist = self.Q.copy()
         # Initialize writer
         writer = cv2.VideoWriter(
-            outputPath,
-            fourcc,
-            fps,
+            self.outputPath,
+            self.fourcc,
+            self.fps,
             (framelist[0].shape[1], framelist[0].shape[0]),
-            True,
+            self.is_color,
         )
         while len(framelist) > 0:
             frame = framelist.popleft()
             writer.write(frame)
         writer.release()
-        return
 
     def finish(self):
         """Upon conclusion of an event, stops the recording and sends
@@ -179,7 +185,7 @@ class ShortClipWriter:
 
         if not self.toolong:
             # Start a thread to write the frames
-            self.threads.append(Thread(target=self.write, args=(self.Q.copy(), self.outputPath, self.fourcc, self.fps)))
+            self.threads.append(Thread(target=self.write, args=(),))
             self.threads[-1].daemon = False
             self.threads[-1].start()
 

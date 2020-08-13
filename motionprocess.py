@@ -146,15 +146,15 @@ def write_to_table(pos: "(x,y)"):
     with open("Logs/Obs_Table.csv", "a") as f:
         f.write("{code},{local},{utc},{ptx},{pty}\n".format(**params))
 
+
 def finish_session(sessionid):
-    start_time = dbf.get_entry(sessionid, 'start_time_utc')
+    start_time = dbf.get_entry(sessionid, "start_time_utc")
     end_time = dt.utcnow()
     diff = (end_time - start_time).total_seconds()
-    dbf.update_session(sessionid, {
-        "end_time_utc": end_time,
-        "end_time_local": dt.now(),
-        "elapsed_time": diff,
-        })
+    dbf.update_session(
+        sessionid,
+        {"end_time_utc": end_time, "end_time_local": dt.now(), "elapsed_time": diff,},
+    )
 
 
 def analyze(buffsize, savepath, headless, vpath=None, delay=1):
@@ -194,7 +194,7 @@ def analyze(buffsize, savepath, headless, vpath=None, delay=1):
     disk_full = False
 
     # Get masked image
-    mask = cv2.imread('Images/Current_Loc_Mask.png')
+    mask = cv2.imread("Images/Current_Loc_Mask.png")
     mask = cv2.cvtColor(mask, cv2.COLOR_RGB2GRAY)
     _, mask = cv2.threshold(mask, 100, 255, cv2.THRESH_BINARY)
 
@@ -262,12 +262,18 @@ def analyze(buffsize, savepath, headless, vpath=None, delay=1):
             if not grabbed:
                 counter = 1
                 while not grabbed and counter < 6:
-                    d6log.warning('No frame grabbed. Waiting 60 seconds then retrying. (Attempt {counter})'.format(counter=counter))
+                    d6log.warning(
+                        "No frame grabbed. Waiting 60 seconds then retrying. (Attempt {counter})".format(
+                            counter=counter
+                        )
+                    )
                     time.sleep(60)
                     (grabbed, frame) = cam.read()
                     counter += 1
                 if counter > 6:
-                    d6log.warning("No frame was grabbed and video seeming lost. Exiting run loop.")
+                    d6log.warning(
+                        "No frame was grabbed and video seeming lost. Exiting run loop."
+                    )
                     break
 
             # Initialize frame as no containing an event, so that consecutive
@@ -295,7 +301,9 @@ def analyze(buffsize, savepath, headless, vpath=None, delay=1):
 
             # Subtract and Threshold
             delta = cv2.subtract(gray, avg)
-            thresh = cv2.threshold(delta, shared.BRIGHT_THRESH, 255, cv2.THRESH_BINARY)[1]
+            thresh = cv2.threshold(delta, shared.BRIGHT_THRESH, 255, cv2.THRESH_BINARY)[
+                1
+            ]
             kernel = np.ones([2, 2])
             thresh = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel)
 
@@ -356,7 +364,8 @@ def analyze(buffsize, savepath, headless, vpath=None, delay=1):
                         # kcw.start(p, cv2.VideoWriter_fourcc(*'FFV1'), 30)
                         # kcw.start(p, cv2.VideoWriter_fourcc(*"XVID"), 30)
                         # kcw.start(p, cv2.VideoWriter_fourcc(*'HFYU'), 30)
-                        kcw.start(p, cv2.VideoWriter_fourcc(*'Y800'), 30, isColor=False)
+                        fourcc = cv2.VideoWriter_fourcc(*"Y800")
+                        kcw.start(p, fourcc, 30, is_color=False)
                         d6log.info("New event detected. Video name: {}".format(p))
                         write_to_table(get_Hough_Avg_Pt(lines[0]))
                     else:
@@ -369,7 +378,7 @@ def analyze(buffsize, savepath, headless, vpath=None, delay=1):
 
             # Create output image with grayscale image saved as blue color
             # output = cv2.merge([B, G, R])
-            #output = cv2.cvtColor(B, cv2.COLOR_GRAY2RGB)
+            # output = cv2.cvtColor(B, cv2.COLOR_GRAY2RGB)
             output = B
 
             # Wrapping things up
